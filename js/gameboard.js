@@ -44,9 +44,9 @@ const gameboard = (size) => {
 
     if (
       max_x_index < 0 ||
-      max_x_index > size ||
+      max_x_index > size - 1 ||
       max_y_index < 0 ||
-      max_y_index > size
+      max_y_index > size - 1
     ) {
       console.log("Ship overflows board");
       return false;
@@ -68,7 +68,30 @@ const gameboard = (size) => {
     }
   };
 
-  return { getBoard, placeShip };
+  const receiveAttack = (coords) => {
+    if (
+      coords[0] < 0 ||
+      coords[0] > size - 1 ||
+      coords[1] < 0 ||
+      coords[1] > size - 1
+    ) {
+      console.log("invalid coordinates");
+      return false;
+    }
+    const node = board[coords[1]][coords[0]];
+    if (node == null) {
+      board[coords[1]][coords[0]] = "x";
+      return "miss";
+    } else if (Array.isArray(node)) {
+      shipList[node[0]].hit(node[1]);
+    }
+  };
+
+  const allSunk = () => {
+    return shipList.every((x) => x.isSunk());
+  };
+
+  return { getBoard, placeShip, receiveAttack, allSunk };
 };
 
 module.exports = gameboard;

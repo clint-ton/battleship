@@ -79,3 +79,38 @@ test("Doesnt insert ships that overflow borders", () => {
     [null, null, null, null, null, null, null, null, null, null],
   ]);
 });
+
+test("reports when all ships sunk", () => {
+  const newBoard = gameboard(10);
+  newBoard.placeShip(3, [2, 3], "E");
+  newBoard.placeShip(2, [5, 6], "S");
+  newBoard.placeShip(4, [0, 0], "S");
+  expect(newBoard.allSunk()).toBe(false);
+  newBoard.receiveAttack([2, 3]);
+  newBoard.receiveAttack([3, 3]);
+  expect(newBoard.allSunk()).toBe(false);
+  newBoard.receiveAttack([4, 3]);
+  newBoard.receiveAttack([5, 6]);
+  newBoard.receiveAttack([5, 7]);
+  expect(newBoard.allSunk()).toBe(false);
+  newBoard.receiveAttack([0, 0]);
+  newBoard.receiveAttack([0, 1]);
+  newBoard.receiveAttack([0, 2]);
+  expect(newBoard.allSunk()).toBe(false);
+  newBoard.receiveAttack([0, 3]);
+  expect(newBoard.allSunk()).toBe(true);
+});
+
+test("returns false on our of range attacks", () => {
+  const newBoard = gameboard(10);
+  expect(newBoard.receiveAttack([-1, -1])).toBe(false);
+  expect(newBoard.receiveAttack([10, 10])).toBe(false);
+  expect(newBoard.receiveAttack([-1, 10])).toBe(false);
+  expect(newBoard.receiveAttack([10, -1])).toBe(false);
+});
+
+test("marks a missed attack as 'x' on the gaemboard", () => {
+  const newBoard = gameboard(10);
+  newBoard.receiveAttack([5, 5]);
+  expect(newBoard.getBoard()[5][5]).toEqual("x");
+});
